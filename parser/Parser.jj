@@ -1,0 +1,314 @@
+options{
+	STATIC = false;
+	JDK_VERSION = "1.5";	
+}
+
+
+
+PARSER_BEGIN(Parser)
+import java.io.*;
+import java.util.Stack;
+import java.util.ArrayList;
+import java.lang.Number;
+
+public class Parser{
+    public int last_level = 0;
+    public int line_number = 0;
+    public Stack<Statement_AST> stack_stmt;
+    public ArrayList<Statement_AST> array_stmt;
+    public ArrayList<Statement_AST> set_stmt;
+    public static void main(String[] args) {
+		FileReader reader;
+        ArrayList<Statement_AST> lst;
+		try{
+			reader = new FileReader("test.py");
+		} catch(FileNotFoundException e) {
+			System.out.println("file not found");
+            return;
+		}
+		Parser parser = new Parser(reader);
+		try {
+            parser.Program();
+            lst = parser.get_statement_list();
+		} catch(ParseException e) {
+			System.out.println("parse error, at" + e);
+            return;
+		}
+
+        for(int i=1;i<lst.size();i++) {
+            System.out.println(lst.get(i).print_self());
+        }
+    }
+    public ArrayList<Statement_AST> get_statement_list() {
+        return this.array_stmt;
+    }
+    public void fill(ArrayList<Statement_AST> set_stmt, int m) {
+        for(Statement_AST stmt : set_stmt) {
+            if(stmt.type == "while" || stmt.type =="if") {
+                stmt.out = m;
+            } else {
+                stmt.next = m;
+            }
+        }
+    }
+    public void fillAlgorithm(int down) {
+        Statement_AST x;
+        if(down > 0) {
+            set_stmt.clear();
+            set_stmt.add(array_stmt.get(line_number - 1));
+            while(down > 0) {
+                x = stack_stmt.pop();
+                down = down - 1;
+                if(x.type == "if") {
+                    set_stmt.add(x);
+                    if(down == 0) {
+                        fill(set_stmt, line_number);
+                    }
+                } else if(x.type == "while"){
+                    fill(set_stmt, x.line);
+                    if(down == 0) {
+                        x.out = line_number;
+                    } else {
+                        set_stmt.clear();
+                        set_stmt.add(x);
+                    }
+                }
+            }
+        }
+    }   
+}
+
+PARSER_END(Parser)
+
+
+SKIP: {
+    <BLANK: " ">
+}
+
+TOKEN: {
+    <TAB: "\t"> 
+    |<NEWLINE:  "\r\n" >
+    |<IF: "if">
+    |<ELSE: "else">
+    |<WHERE: "where">
+}
+
+TOKEN: {
+    <BOOL: "True" | "False">
+}
+
+TOKEN: {
+    <NAME: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "_", "0"-"9"])*>
+}
+
+TOKEN: {
+    	<INT: "0"
+			| ("-")? ["1" - "9"] (["0" - "9"])*>
+}
+
+
+
+TOKEN: {
+    <FLOAT: ["0"-"9"](["0"-"9"])* "." (["0"-"9"])*>
+}
+
+ArrayList<Statement_AST> Program():
+{
+    stack_stmt = new Stack();
+    array_stmt = new ArrayList();
+    array_stmt.add(null);
+    set_stmt = new ArrayList();
+    int down;
+    int current_level = 0;
+}
+{
+    (Oneline())*
+    {
+        line_number ++;
+        current_level = 0;
+        down = last_level - current_level;
+        fillAlgorithm(down);
+        array_stmt.add(new Statement_AST("null")); //the last
+        return array_stmt;
+    }
+}
+
+
+void Oneline():
+{
+    Statement_AST ast;
+    int down;
+    Statement_AST x;
+}
+{
+    down = Indentation()
+    ast = Statement()
+    {
+        line_number ++;
+        ast.line = line_number;
+
+        if(ast.type == "while" || ast.type == "if") { //设置in和next，若是while或if则进栈
+            ast.in = line_number + 1;
+            stack_stmt.push(ast);
+        } else {
+            ast.next = line_number + 1;
+        }
+
+        array_stmt.add(ast); // 把语句加入语句数组
+
+        fillAlgorithm(down);
+    }
+}
+
+
+int Indentation():
+{
+    int current_level = 0;
+    int down;
+}
+{
+    (<TAB>{current_level++;})*
+    {
+        if(current_level > last_level) {
+            //不可能出现这种情况,报错
+            down = -1;
+        } else if (current_level == last_level) {
+            down = 0;
+        } else {
+            down = current_level - last_level;
+            last_level = current_level; 
+        }
+        return down;
+    }
+}
+
+Statement_AST Statement():
+{
+    Statement_AST ast;
+}
+{
+
+    ast = Empty_Statement(){return ast;}
+    |ast = Assign_Statement(){return ast;}
+    |ast = If_Statement() {return ast;}
+}
+
+Statement_AST Empty_Statement():
+{
+    Statement_AST ast;
+}
+{
+    <NEWLINE>
+    {
+        ast = new Statement_AST("null");
+        System.out.println("a null statement detected");
+        return ast;
+    }
+}
+
+Statement_AST Assign_Statement():
+{
+    Statement_AST ast;
+    Token t;
+    Expression_AST ast2;
+}
+{
+    t = <NAME> "=" ast2 = Expression() <NEWLINE>
+    {
+        ast = new Statement_AST("=");
+        ast.left = t.image;
+        ast.right = ast2;
+        return ast;
+    }
+}
+
+Statement_AST If_Statement():
+{
+    Statement_AST ast;
+}
+{
+    <IF> Expression() ":" <NEWLINE>
+    {
+        ast = new Statement_AST("if");
+        return ast;
+    }    
+}
+
+Statement_AST Where_Statement():
+{
+    Statement_AST ast;
+}
+{
+    <WHERE> Expression() ":" <NEWLINE>
+    {
+        ast = new Statement_AST("where");
+        return ast;
+    }    
+}
+
+Statement_AST Else_Statement():
+{
+    Statement_AST ast;
+}
+{
+    <ELSE> ":"
+    {
+        ast = new Statement_AST("else");
+        return ast;
+    }
+}
+
+
+Expression_AST Expression():
+{
+    Expression_AST ast;
+}
+{
+    ast = Primary()
+    {
+        return ast;
+    }
+}
+
+
+Expression_AST Primary():
+{
+    Token t;
+    Expression_AST ast;
+}
+{
+    t = <NAME>
+    {
+        String s = t.image;
+        ast = new Expression_AST("name");
+        ast.value_name = s;
+        return ast;
+    }
+    |t = <INT>
+    {
+        int i = Integer.parseInt(t.image);
+        ast = new Expression_AST("int");
+        ast.value_int = i;
+        return ast;
+    }
+    |t = <FLOAT>
+    {
+        float f = Float.parseFloat(t.image);
+        ast = new Expression_AST("float");
+        ast.value_float = f;
+        return ast;
+    }
+    |t = <BOOL>
+    {
+        boolean b;
+        System.out.println("boolean");
+        if(t.image.equals("True")) {
+            b = true;
+        } else {
+            b = false;
+        }
+        ast = new Expression_AST("bool");
+        ast.value_boolean = b;
+        return ast;
+    }
+}
