@@ -1,4 +1,4 @@
-
+package pythy.parser;
 public class Statement_AST{
     String type; //"if" "where" "null" "="
     String left;//赋值运算的左值

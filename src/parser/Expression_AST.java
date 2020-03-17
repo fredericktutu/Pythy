@@ -1,3 +1,4 @@
+package pythy.parser;
 import java.beans.Expression;
 
 public class Expression_AST {
@@ -28,6 +29,10 @@ public class Expression_AST {
             case "bool":
             {
                 return "<bool:" + this.value_boolean + ">";
+            }
+            case "+":
+            {
+                return "";
             }
             default:
             {
