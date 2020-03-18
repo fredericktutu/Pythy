@@ -2,8 +2,12 @@ package pythy.test;
 import java.io.*;
 import java.util.ArrayList;
 import pythy.parser.*;
+import pythy.execute.*;
 /*
-测试一：编译单元测试，读取文件，编译，并打印语法树
+测试二：编译、执行集成测试
+执行器需要能够正确地执行执行三种赋值语句
+并且能够在每一步，都正确地把符号表的内容打印在files文件夹下的output2.dot下
+
 */
 public class Test1 {
     public static void main(String[] args) {
@@ -11,7 +15,7 @@ public class Test1 {
 		FileReader reader;
         ArrayList<Statement_AST> lst;
 		try{
-			reader = new FileReader("files/test1.py");
+			reader = new FileReader("files/test2.py");
 		} catch(FileNotFoundException e) {
 			System.out.println("file not found");
             return;
@@ -26,11 +30,15 @@ public class Test1 {
 		} catch(ParseException e) {
 			System.out.println("parse error, at" + e);
             return;
-		}
-
-		//print statements
-        for(int i=1;i<lst.size();i++) {
-            System.out.println(lst.get(i).print_self());
         }
+        
+        //begin executing 
+        Executer exccuter = new Executer();
+        executer.statement_list = lst;      //将语句ast加入
+        executer.excute_all();
+        //目标1：每执行一步，print哈希表到控制台，看是否正确
+        //目标2：将哈希表打印到文件
+
+        
     }
 }
