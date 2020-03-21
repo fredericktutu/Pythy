@@ -9,7 +9,7 @@ import pythy.execute.*;
 并且能够在每一步，都正确地把符号表的内容打印在files文件夹下的output2.dot下
 
 */
-public class Test1 {
+public class Test2 {
     public static void main(String[] args) {
 		//file reading
 		FileReader reader;
@@ -31,11 +31,18 @@ public class Test1 {
 			System.out.println("parse error, at" + e);
             return;
         }
+        System.out.println("----------parse finish-------");
+        for(int i=1;i<lst.size();i++) {
+            System.out.println(lst.get(i).print_self());
+        }
+        System.out.println("-------start to execute------");
         
         //begin executing 
-        Executer exccuter = new Executer();
+        Executer executer = new Executer();
         executer.statement_list = lst;      //将语句ast加入
-        executer.excute_all();
+
+        executer.execute_all();
+        System.out.println("------execute finish---------");
         //目标1：每执行一步，print哈希表到控制台，看是否正确
         //目标2：将哈希表打印到文件
 

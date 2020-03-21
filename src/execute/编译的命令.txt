@@ -1,1 +1,0 @@
-javac Executer.java -classpath ../../class -d ../../class

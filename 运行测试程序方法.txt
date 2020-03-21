@@ -1,0 +1,10 @@
+java -cp class pythy.test.TestN
+
+替换N为数字1，2....
+
+测试程序位于src/test/
+测试样例位于files/
+
+Test1：测试编译部分正确性
+Test2:  赋值语句正确性（表达式仅限int string bool）
+

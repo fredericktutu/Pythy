@@ -36,5 +36,5 @@ Pythy> javac src/test/test1.java -classpath class -d class
 
 在运行的时候,类似,假如我们处于根目录,也需要交代`classpath`参数
 ```
-Pythy> java class/pythy/test1 -classpath class
+Pythy> java -cp class pythy.test.Test1
 ```

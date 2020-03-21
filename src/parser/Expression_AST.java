@@ -2,17 +2,19 @@ package pythy.parser;
 import java.beans.Expression;
 
 public class Expression_AST {
-    String type; //"name" "int" "float" "bool" "+" "-"
+    public String type; //"name" "int" "float" "bool" "+" "-"
+    //+
+    public Expression_AST left;  
+    //1
+    public Expression_AST right;
+    //Expression_AST name value_name("x")
 
-    Expression_AST left;
-    Expression_AST right;
+    public int value_int;
+    public float value_float;
+    public boolean value_boolean;
+    public String value_name;
 
-    int value_int;
-    float value_float;
-    boolean value_boolean;
-    String value_name;
-
-    Expression_AST(String type) {
+    public Expression_AST(String type) {
         this.type = type;
     }
 
