@@ -68,6 +68,8 @@ public class Executer {
 	//用来对表达式进行递归求值,返回封装好的值
     public Expression_AST eval(Expression_AST ast) throws PRTException{
 		Expression_AST ret;//switch的不同case同属于一个块
+		Expression_AST expLeft;
+		Expression_AST expRight;
     	switch(ast.type) {
 	    case "bool":	    
 	    	ret = new Expression_AST("bool");
@@ -92,9 +94,168 @@ public class Executer {
 	        }catch(PRTException e) {
 	            throw e;
 	        }
- 
+		case "+":
+		case "-":
+		case "*":
+		case "/":
+			expLeft = eval(ast.left);
+			expRight = eval(ast.right);
+			if (expLeft.type == "int" && expRight.type == "int"){
+				int result = operation(ast.type, expLeft.value_int, expRight.value_int);
+				ret= new Expression_AST("int");
+				ret.value_int = result;
+				return ret;
+			}
+			float fresult = 0;
+			if (expLeft.type == "int" && expRight.type == "float")
+				fresult = operation(ast.type, expLeft.value_int, expRight.value_float);
+			else if (expLeft.type == "float" && expRight.type == "int")
+				fresult = operation(ast.type, expLeft.value_float, expRight.value_int);
+			else if (expLeft.type == "float" && expRight.type == "float")
+				fresult = operation(ast.type, expLeft.value_int, expRight.value_int);
+			else if (expLeft.type == "bool" || expRight.type == "bool"){
+				String op = "";
+				switch(ast.type){
+				case "+": op = "added";
+				case "-": op = "subed";	
+				case "*": op = "timed";
+				case "/": op = "divided";
+				}
+				throw new PRTException(expLeft.type+" and "+expRight.type
+					+ " can't be " + op);
+			}
+			ret= new Expression_AST("float");
+			ret.value_float = fresult;
+			return ret;
+		case "and":
+		case "or":
+		case "not":
+			expLeft = eval(ast.left);
+			expRight = eval(ast.right);
+			boolean leftBoolean, rightBoolean;
+			switch (expLeft.type){
+			case "bool": leftBoolean = expLeft.value_boolean; break;
+			case "int": 
+				if (expLeft.value_int == 0)
+					leftBoolean = false;
+				else
+					leftBoolean = true;
+				break;
+			case "float":
+				if (expLeft.value_float == 0.0)
+					leftBoolean = false;
+				else
+					leftBoolean = true;
+				break;
+			default:
+				leftBoolean = false;
+				break;
+			}
+			switch (expRight.type){
+			case "bool": rightBoolean = expRight.value_boolean; break;
+			case "int": 
+				if (expRight.value_int == 0)
+					rightBoolean = false;
+				else
+					rightBoolean = true;
+				break;
+			case "float":
+				if (expRight.value_float == 0.0)
+					rightBoolean = false;
+				else
+					rightBoolean = true;
+				break;
+			default:
+				rightBoolean = true;
+				break;
+			}
+			String result = booleanOperation(ast.type, leftBoolean, rightBoolean);
+			switch(result){
+			case "true":
+				ret= new Expression_AST("boolean");
+				ret.value_boolean = true;
+				return ret;
+			case "false":
+				ret= new Expression_AST("boolean");
+				ret.value_boolean = false;
+				return ret;
+			case "left":
+				return expLeft;
+			case "right":
+				return expRight;
+			default:
+				return null;
+			}
 		}
 		return null;
-    }
+	}
+	
+	public int operation(String op, int a, int b){
+		switch(op){
+		case"+": return a+b;
+		case"-": return a-b;
+		case"*": return a*b;
+		case"/": return a/b;
+		default: return 0;
+		}
+	}
+	public float operation(String op, int a, float b){
+		switch(op){
+		case"+": return a+b;
+		case"-": return a-b;
+		case"*": return a*b;
+		case"/": return a/b;
+		default: return 0;
+		}
+	}
+	public float operation(String op, float a, int b){
+		switch(op){
+		case"+": return a+b;
+		case"-": return a-b;
+		case"*": return a*b;
+		case"/": return a/b;
+		default: return 0;
+		}
+	}
+	public float operation(String op, float a, float b){
+		switch(op){
+		case"+": return a+b;
+		case"-": return a-b;
+		case"*": return a*b;
+		case"/": return a/b;
+		default: return 0;
+		}
+	}
+	
+	public String booleanOperation(String op, boolean a, boolean b){
+		switch (op){
+		case "and":
+			if(a == true && b == true)
+				return "right";
+			if(a == true && b == false)
+				return "right";
+			if(a == false && b == true)
+				return "left";
+			if(a == false && b == false)
+				return "left";
+		case "or":
+			if(a == true && b == true)
+				return "left";
+			if(a == true && b == false)
+				return "left";
+			if(a == false && b == true)
+				return "right";
+			if(a == false && b == false)
+				return "right";
+		case "not":
+			if(a == true)
+				return "false";
+			if(a == false)
+				return "true";
+		default:
+			return "never reach";
+		}
+	}
+	
     public void Reset() {}     //需要对执行器进行重启，就是恢复一开始的状态，重新设置一些属性
 }

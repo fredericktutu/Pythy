@@ -71,6 +71,16 @@ TOKEN: {
     |<IF: "if">
     |<ELSE: "else">
     |<WHERE: "where">
+    |<AND: "and">
+    |<OR: "or">
+    |<NOT: "not">
+    |<ADD: "+">
+    |<SUB: "-">
+    |<TIME: "*">
+    |<DIV_INT: "//">
+    |<DIV_FLOAT: "/">
+    |<LP: "(">
+    |<RP: ")">
 }
 
 TOKEN: {
@@ -244,14 +254,216 @@ Expression_AST Expression():
     Expression_AST ast;
 }
 {
-    ast = Primary()
+    ast=Bool_Expression()
+    {
+        return ast;
+    }
+}
+
+Expression_AST Bool_Expression():
+{
+    Expression_AST ast;
+}
+{
+    ast=Or_Expression()
+    {
+        return ast;
+    }
+}
+Expression_AST Or_Expression():
+{
+    Expression_AST ast;
+    Expression_AST ast_left;
+    Expression_AST ast_right;
+}
+{
+    ast_left =And_Expression(){ast = ast_left;} (<OR> ast_right = And_Expression()
+                                {
+                                    ast = new Expression_AST("or");
+                                    ast.left = ast_left;
+                                    ast.right = ast_right;
+                                    ast_left = ast;
+                                })*
+    {
+        return ast;
+    }
+}
+
+Expression_AST And_Expression():
+{
+    Expression_AST ast;
+    Expression_AST ast_left;
+    Expression_AST ast_right;
+}
+{
+    ast_left =Not_Expression(){ast = ast_left;}
+                             (<AND> ast_right = Not_Expression()
+                                {
+                                    ast = new Expression_AST("and");
+                                    ast.left = ast_left;
+                                    ast.right = ast_right;
+                                    ast_left = ast;
+                                })*
+    {
+        return ast;
+    }
+}
+
+Expression_AST Not_Expression():
+{
+    int count = 0;
+    Expression_AST ast_ret;
+    Expression_AST ast_ret2;
+    Expression_AST ast;
+}
+{
+	(<NOT>{count += 1;})* ast=Compare_Expression()
+    {
+        if(count == 0) {
+            return ast;
+        } else if(count % 2 == 1) {
+            ast_ret = new Expression_AST("not");
+            ast_ret.left = ast;
+            return ast_ret;
+        } else {
+            ast_ret2 = new Expression_AST("not");
+            ast_ret2.left = ast;
+            ast_ret = new Expression_AST("not");
+            ast_ret.left = ast_ret2;
+            return ast_ret;
+        }
+    }
+}
+
+Expression_AST Compare_Expression():
+{    
+    Expression_AST ast;
+    Expression_AST ast_left;
+    Expression_AST ast_right;
+}
+{
+	ast_left=Arithmatic_Expression() {ast = ast_left;}
+						("==" ast_right=Arithmatic_Expression()
+                        {
+                            ast = new Expression_AST("==");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+                        |">=" ast_right=Arithmatic_Expression()
+                        {
+                            ast = new Expression_AST(">=");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+                        |">" ast_right=Arithmatic_Expression()
+                        {
+                            ast = new Expression_AST(">");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+                        |"!=" ast_right=Arithmatic_Expression()
+                        {
+                            ast = new Expression_AST("!=");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+                        |"<=" ast_right=Arithmatic_Expression()
+                        {
+                            ast = new Expression_AST("<=");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+                        |"<" ast_right=Arithmatic_Expression()
+                        {
+                            ast = new Expression_AST("<");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        })*
+    {
+        return ast;
+    }
+}
+
+Expression_AST Arithmatic_Expression():
+{
+    Expression_AST ast;
+}
+{
+	ast = Additive_Expression()
+    {
+        return ast;
+    }
+}
+
+Expression_AST Additive_Expression():
+{
+    Expression_AST ast;
+    Expression_AST ast_left;
+    Expression_AST ast_right;
+}
+{
+	ast_left=Multive_Expression() {ast = ast_left;}
+                        (<ADD> ast_right=Multive_Expression()
+                         {
+                            ast = new Expression_AST("+");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                         }
+						|<SUB> ast_right=Multive_Expression()
+                        {
+                            ast = new Expression_AST("-");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        })*
+    {
+        return ast;
+    }
+}
+
+Expression_AST Multive_Expression():
+{
+    Expression_AST ast;
+    Expression_AST ast_left;
+    Expression_AST ast_right;
+}
+{
+	ast_left = Primary_Expression(){ast = ast_left;}
+                     (<TIME> ast_right=Primary_Expression()
+                        {
+                            ast = new Expression_AST("*");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+						|<DIV_INT> ast_right=Primary_Expression()
+                        {
+                            ast = new Expression_AST("//");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        }
+                        |<DIV_FLOAT> ast_right=Primary_Expression()
+                        {
+                            ast = new Expression_AST("/");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+                        })*
     {
         return ast;
     }
 }
 
 
-Expression_AST Primary():
+Expression_AST Primary_Expression():
 {
     Token t;
     Expression_AST ast;
@@ -289,6 +501,10 @@ Expression_AST Primary():
         }
         ast = new Expression_AST("bool");
         ast.value_boolean = b;
+        return ast;
+    }
+    |<LP> ast = Expression() <RP>
+    {
         return ast;
     }
 }

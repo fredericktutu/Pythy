@@ -3,11 +3,10 @@ import java.beans.Expression;
 
 public class Expression_AST {
     public String type; //"name" "int" "float" "bool" "+" "-"
-    //+
     public Expression_AST left;  
-    //1
+ 
     public Expression_AST right;
-    //Expression_AST name value_name("x")
+
 
     public int value_int;
     public float value_float;
@@ -22,7 +21,7 @@ public class Expression_AST {
         switch(this.type) {
             case "int": 
             {
-                return "<int" + this.value_int + ">";
+                return "<int:" + this.value_int + ">";
             }
             case "float":
             {
@@ -33,8 +32,15 @@ public class Expression_AST {
                 return "<bool:" + this.value_boolean + ">";
             }
             case "+":
+            case "-":
+            case "*":
+            case "//":
+            case "/":
+            case "and":
+            case "or":
+            case "not":
             {
-                return "";
+                return "<" + this.left.print_self() + " " + this.type + " "+  this.right.print_self() + ">";
             }
             default:
             {

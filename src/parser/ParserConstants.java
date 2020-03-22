@@ -23,13 +23,33 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int WHERE = 6;
   /** RegularExpression Id. */
-  int BOOL = 7;
+  int AND = 7;
   /** RegularExpression Id. */
-  int NAME = 8;
+  int OR = 8;
   /** RegularExpression Id. */
-  int INT = 9;
+  int NOT = 9;
   /** RegularExpression Id. */
-  int FLOAT = 10;
+  int ADD = 10;
+  /** RegularExpression Id. */
+  int SUB = 11;
+  /** RegularExpression Id. */
+  int TIME = 12;
+  /** RegularExpression Id. */
+  int DIV_INT = 13;
+  /** RegularExpression Id. */
+  int DIV_FLOAT = 14;
+  /** RegularExpression Id. */
+  int LP = 15;
+  /** RegularExpression Id. */
+  int RP = 16;
+  /** RegularExpression Id. */
+  int BOOL = 17;
+  /** RegularExpression Id. */
+  int NAME = 18;
+  /** RegularExpression Id. */
+  int INT = 19;
+  /** RegularExpression Id. */
+  int FLOAT = 20;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -43,12 +63,28 @@ public interface ParserConstants {
     "\"if\"",
     "\"else\"",
     "\"where\"",
+    "\"and\"",
+    "\"or\"",
+    "\"not\"",
+    "\"+\"",
+    "\"-\"",
+    "\"*\"",
+    "\"//\"",
+    "\"/\"",
+    "\"(\"",
+    "\")\"",
     "<BOOL>",
     "<NAME>",
     "<INT>",
     "<FLOAT>",
     "\"=\"",
     "\":\"",
+    "\"==\"",
+    "\">=\"",
+    "\">\"",
+    "\"!=\"",
+    "\"<=\"",
+    "\"<\"",
   };
 
 }

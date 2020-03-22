@@ -8,3 +8,6 @@ java -cp class pythy.test.TestN
 Test1：测试编译部分正确性
 Test2:  赋值语句正确性（表达式仅限int string bool）
 
+
+
+

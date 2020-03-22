@@ -1,3 +1,1 @@
-a = 1
-b = 1.0
-c = True
+a = 1 and 2 or 1
