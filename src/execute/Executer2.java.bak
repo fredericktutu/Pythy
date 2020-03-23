@@ -1,5 +1,6 @@
 package pythy.execute;
 import pythy.parser.*;
+import java.io.*;
 
 
 
@@ -8,8 +9,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.io.FileWriter;
-import java.beans.Expression;
-import java.io.File;
 
 //放在Pythy/src/execute下面，编译的语句如下(如果你的命令行处于此文件夹)
 /*
@@ -23,87 +22,47 @@ public class Executer {
      */
     public ArrayList<Statement_AST> statement_list;  //语句ast的列表，第0个没放东西，从第1个开始
     public FileWriter file_writer;          //输出哈希表信息到文件，暂时不用实现
-	public FileWriter console_writer;  // 输出控制台信息，暂时不用实现
-	public File console_file;
+    public FileWriter console_writer;  // 输出控制台信息，暂时不用实现
 	public Environment env;
     //符号表等需要的属性 由执行部分来定义
 
     public int pc;          //当前进行到的表达式行号，初始化为1
-	public boolean end;         //是否结束，初始化为False
-	
-	public void stop() {
-		try{
-			this.console_writer.close();
-		}catch(Exception e) {
-			System.out.println(e);
-		}
-
-	}
+    public boolean end;         //是否结束，初始化为False
     
-    public Executer() {
+    public Executer() throws IOException {
     	this.pc = 1;
 		this.end = false;
 		this.env = new Environment(); 
-		try{
-			console_file = new File("files/console.txt");//这个文件用来装要输出到console的信息
-			this.console_writer = new FileWriter(console_file ,false);//设定consoleWriter写Console.txt
-			console_writer.write("Welcome to Pythy Interpreter!\n");
-			console_writer.flush();
-		}catch(Exception e) {
-			System.out.println("file not found");
-		}
-		
-
+		File Console = new File(" files/Console.txt ");//这个文件用来装要输出到console的信息
+		this.console_writer = new FileWriter(Console,true);//设定consoleWriter写Console.txt
  	}
 
-    public void execute_once() {
+    public void execute_once () throws IOException{
 		Statement_AST ast_now = statement_list.get(pc);
-		Expression_AST exp;
-		System.out.println("pc:" + pc + " type:" +ast_now.type);
-
+		System.out.println("pc:" + pc);
     	try {
     		switch (ast_now.type) {
 	    	case "=":
 				env.put(ast_now.left,eval(ast_now.right));
 				pc = ast_now.next;
-				break;
-			case "echo":
-				exp = eval(ast_now.right);
-				try{
-					this.console_writer.write(exp.print_console());
-					console_writer.flush();
-				}catch(Exception e2) {
-					System.out.println("os error");
-				}
-				pc = ast_now.next;
-				break;
+	    		break;
 	    	case "if":
 	    	case "while":
-			case "null"://if while null暂未实现
-				pc = pc + 1;
-				break;
-			case "end":
-				this.end = true;
-				break;
+	    	case "null"://if while null暂未实现
+	    		break;
 			}//end switch
 				
     	}catch(PRTException e) {
+    		this.console_writer.write("An error happens at line " + ast_now.line + ":\n" + e.errmsg + "\n");
 			//System.out.println("An error happens at line " + ast_now.line + ":\n" + e.errmsg);
-			try{
-				this.console_writer.write("An error happens at line " + ast_now.line + ":\n" + e.errmsg + "\n");
-				console_writer.flush();
-			}catch(Exception e2) {
-				System.out.println("os error");
-			}
-
 			this.end = true;
     	}
 }
  //运行一行语句，按照pc来取语句，运行结束，计算出下一条指令的号码，并设置。
  //如果已经到了最后一句，应该设置end为True 
 
-    public void execute_all() {
-		while(end == false) {
+    public void execute_all() throws IOException{
+		while(pc < statement_list.size()-1 && end == false) {
 			execute_once();
 		}
 
@@ -143,7 +102,6 @@ public class Executer {
 		case "-":
 		case "*":
 		case "/":
-		{
 			expLeft = eval(ast.left);
 			expRight = eval(ast.right);
 			if (expLeft.type == "int" && expRight.type == "int"){
@@ -173,30 +131,56 @@ public class Executer {
 			ret= new Expression_AST("float");
 			ret.value_float = fresult;
 			return ret;
-		}
 		case "and":
 		case "or":
 		case "not":
-		{
-			if(ast.type.equals("not")) {
-				expLeft = eval(ast.left);
-				expRight = new Expression_AST("bool");
-				expRight.value_boolean = true;
-			} else{
-				expLeft = eval(ast.left);
-				expRight = eval(ast.right);
-			}
+			expLeft = eval(ast.left);
+			expRight = eval(ast.right);
 			boolean leftBoolean, rightBoolean;
-			leftBoolean = boolean_value(expLeft);
-			rightBoolean = boolean_value(expRight);
+			switch (expLeft.type){
+			case "bool": leftBoolean = expLeft.value_boolean; break;
+			case "int": 
+				if (expLeft.value_int == 0)
+					leftBoolean = false;
+				else
+					leftBoolean = true;
+				break;
+			case "float":
+				if (expLeft.value_float == 0.0)
+					leftBoolean = false;
+				else
+					leftBoolean = true;
+				break;
+			default:
+				leftBoolean = false;
+				break;
+			}
+			switch (expRight.type){
+			case "bool": rightBoolean = expRight.value_boolean; break;
+			case "int": 
+				if (expRight.value_int == 0)
+					rightBoolean = false;
+				else
+					rightBoolean = true;
+				break;
+			case "float":
+				if (expRight.value_float == 0.0)
+					rightBoolean = false;
+				else
+					rightBoolean = true;
+				break;
+			default:
+				rightBoolean = true;
+				break;
+			}
 			String result = booleanOperation(ast.type, leftBoolean, rightBoolean);
 			switch(result){
 			case "true":
-				ret= new Expression_AST("bool");
+				ret= new Expression_AST("boolean");
 				ret.value_boolean = true;
 				return ret;
 			case "false":
-				ret= new Expression_AST("bool");
+				ret= new Expression_AST("boolean");
 				ret.value_boolean = false;
 				return ret;
 			case "left":
@@ -207,35 +191,9 @@ public class Executer {
 				return null;
 			}
 		}
-		default:
-		{
-			return null;
-		}
-		}//end big switch
+		return null;
 	}
 	
-	public boolean boolean_value(Expression_AST ast) {
-		boolean res;
-		switch (ast.type){
-			case "bool": res = ast.value_boolean; break;
-			case "int": 
-				if (ast.value_int == 0)
-					res = false;
-				else
-					res = true;
-				break;
-			case "float":
-				if (ast.value_float == 0.0)
-					res = false;
-				else
-					res = true;
-				break;
-			default:
-				res = false;
-				break;
-			}
-		return res;
-	}
 	public int operation(String op, int a, int b){
 		switch(op){
 		case"+": return a+b;
@@ -245,7 +203,6 @@ public class Executer {
 		default: return 0;
 		}
 	}
-	
 	public float operation(String op, int a, float b){
 		switch(op){
 		case"+": return a+b;

@@ -43,13 +43,15 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int RP = 16;
   /** RegularExpression Id. */
-  int BOOL = 17;
+  int ECHO = 17;
   /** RegularExpression Id. */
-  int NAME = 18;
+  int BOOL = 18;
   /** RegularExpression Id. */
-  int INT = 19;
+  int NAME = 19;
   /** RegularExpression Id. */
-  int FLOAT = 20;
+  int INT = 20;
+  /** RegularExpression Id. */
+  int FLOAT = 21;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -73,6 +75,7 @@ public interface ParserConstants {
     "\"/\"",
     "\"(\"",
     "\")\"",
+    "\"echo\"",
     "<BOOL>",
     "<NAME>",
     "<INT>",

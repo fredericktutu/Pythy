@@ -63,6 +63,7 @@ public class Parser implements ParserConstants {
       case TAB:
       case NEWLINE:
       case IF:
+      case ECHO:
       case NAME:
         ;
         break;
@@ -76,7 +77,7 @@ public class Parser implements ParserConstants {
         current_level = 0;
         down = last_level - current_level;
         fillAlgorithm(down);
-        array_stmt.add(new Statement_AST("null")); //the last
+        array_stmt.add(new Statement_AST("end")); //the last
         {if (true) return array_stmt;}
     throw new Error("Missing return statement in function");
   }
@@ -146,6 +147,10 @@ public class Parser implements ParserConstants {
       ast = If_Statement();
                            {if (true) return ast;}
       break;
+    case ECHO:
+      ast = Echo_Statement();
+                             {if (true) return ast;}
+      break;
     default:
       jj_la1[2] = jj_gen;
       jj_consume_token(-1);
@@ -158,7 +163,6 @@ public class Parser implements ParserConstants {
     Statement_AST ast;
     jj_consume_token(NEWLINE);
         ast = new Statement_AST("null");
-        System.out.println("a null statement detected");
         {if (true) return ast;}
     throw new Error("Missing return statement in function");
   }
@@ -168,7 +172,7 @@ public class Parser implements ParserConstants {
     Token t;
     Expression_AST ast2;
     t = jj_consume_token(NAME);
-    jj_consume_token(21);
+    jj_consume_token(22);
     ast2 = Expression();
     jj_consume_token(NEWLINE);
         ast = new Statement_AST("=");
@@ -178,11 +182,23 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+  final public Statement_AST Echo_Statement() throws ParseException {
+    Statement_AST ast;
+    Expression_AST ast2;
+    jj_consume_token(ECHO);
+    ast2 = Expression();
+    jj_consume_token(NEWLINE);
+        ast = new Statement_AST("echo");
+        ast.right = ast2;
+        {if (true) return ast;}
+    throw new Error("Missing return statement in function");
+  }
+
   final public Statement_AST If_Statement() throws ParseException {
     Statement_AST ast;
     jj_consume_token(IF);
     Expression();
-    jj_consume_token(22);
+    jj_consume_token(23);
     jj_consume_token(NEWLINE);
         ast = new Statement_AST("if");
         {if (true) return ast;}
@@ -193,7 +209,7 @@ public class Parser implements ParserConstants {
     Statement_AST ast;
     jj_consume_token(WHERE);
     Expression();
-    jj_consume_token(22);
+    jj_consume_token(23);
     jj_consume_token(NEWLINE);
         ast = new Statement_AST("where");
         {if (true) return ast;}
@@ -203,7 +219,7 @@ public class Parser implements ParserConstants {
   final public Statement_AST Else_Statement() throws ParseException {
     Statement_AST ast;
     jj_consume_token(ELSE);
-    jj_consume_token(22);
+    jj_consume_token(23);
         ast = new Statement_AST("else");
         {if (true) return ast;}
     throw new Error("Missing return statement in function");
@@ -321,12 +337,12 @@ public class Parser implements ParserConstants {
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 23:
       case 24:
       case 25:
       case 26:
       case 27:
       case 28:
+      case 29:
         ;
         break;
       default:
@@ -334,18 +350,10 @@ public class Parser implements ParserConstants {
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 23:
-        jj_consume_token(23);
-        ast_right = Arithmatic_Expression();
-                            ast = new Expression_AST("==");
-                            ast.left = ast_left;
-                            ast.right = ast_right;
-                            ast_left = ast;
-        break;
       case 24:
         jj_consume_token(24);
         ast_right = Arithmatic_Expression();
-                            ast = new Expression_AST(">=");
+                            ast = new Expression_AST("==");
                             ast.left = ast_left;
                             ast.right = ast_right;
                             ast_left = ast;
@@ -353,7 +361,7 @@ public class Parser implements ParserConstants {
       case 25:
         jj_consume_token(25);
         ast_right = Arithmatic_Expression();
-                            ast = new Expression_AST(">");
+                            ast = new Expression_AST(">=");
                             ast.left = ast_left;
                             ast.right = ast_right;
                             ast_left = ast;
@@ -361,7 +369,7 @@ public class Parser implements ParserConstants {
       case 26:
         jj_consume_token(26);
         ast_right = Arithmatic_Expression();
-                            ast = new Expression_AST("!=");
+                            ast = new Expression_AST(">");
                             ast.left = ast_left;
                             ast.right = ast_right;
                             ast_left = ast;
@@ -369,13 +377,21 @@ public class Parser implements ParserConstants {
       case 27:
         jj_consume_token(27);
         ast_right = Arithmatic_Expression();
-                            ast = new Expression_AST("<=");
+                            ast = new Expression_AST("!=");
                             ast.left = ast_left;
                             ast.right = ast_right;
                             ast_left = ast;
         break;
       case 28:
         jj_consume_token(28);
+        ast_right = Arithmatic_Expression();
+                            ast = new Expression_AST("<=");
+                            ast.left = ast_left;
+                            ast.right = ast_right;
+                            ast_left = ast;
+        break;
+      case 29:
+        jj_consume_token(29);
         ast_right = Arithmatic_Expression();
                             ast = new Expression_AST("<");
                             ast.left = ast_left;
@@ -563,7 +579,7 @@ public class Parser implements ParserConstants {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x4001c,0x4,0x40018,0x100,0x80,0x200,0x1f800000,0x1f800000,0xc00,0xc00,0x7000,0x7000,0x1e8000,};
+      jj_la1_0 = new int[] {0xa001c,0x4,0xa0018,0x100,0x80,0x200,0x3f000000,0x3f000000,0xc00,0xc00,0x7000,0x7000,0x3c8000,};
    }
 
   /** Constructor with InputStream. */
@@ -680,7 +696,7 @@ public class Parser implements ParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[29];
+    boolean[] la1tokens = new boolean[30];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -694,7 +710,7 @@ public class Parser implements ParserConstants {
         }
       }
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 30; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

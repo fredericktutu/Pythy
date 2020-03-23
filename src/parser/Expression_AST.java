@@ -16,7 +16,35 @@ public class Expression_AST {
     public Expression_AST(String type) {
         this.type = type;
     }
+    public String print_console() {
+        switch(this.type) {
+            case "int" :
+            {
+                return "" + this.value_int + "\n";
+            }
+            case "float":
+            {
+                return "" + this.value_float + "\n";
+            }
+            case "bool":
+            {
+                if(this.value_boolean) {
+                    return "True\n";
+                } else {
+                    return "False\n";
+                }
+            }
+            default:
+            {
+                return "";
+            }
+        }
 
+
+
+
+
+    }
     public String print_self() {
         switch(this.type) {
             case "int": 

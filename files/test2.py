@@ -1,3 +1,4 @@
-x = 1
-x = 1.0
-x = y
+echo not 1
+echo not 0
+echo True
+

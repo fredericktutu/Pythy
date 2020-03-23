@@ -42,6 +42,7 @@ public class Test2 {
         executer.statement_list = lst;      //将语句ast加入
 
         executer.execute_all();
+        executer.stop();
         System.out.println("------execute finish---------");
         //目标1：每执行一步，print哈希表到控制台，看是否正确
         //目标2：将哈希表打印到文件

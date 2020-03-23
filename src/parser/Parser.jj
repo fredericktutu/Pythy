@@ -81,6 +81,7 @@ TOKEN: {
     |<DIV_FLOAT: "/">
     |<LP: "(">
     |<RP: ")">
+    |<ECHO: "echo">
 }
 
 TOKEN: {
@@ -118,7 +119,7 @@ ArrayList<Statement_AST> Program():
         current_level = 0;
         down = last_level - current_level;
         fillAlgorithm(down);
-        array_stmt.add(new Statement_AST("null")); //the last
+        array_stmt.add(new Statement_AST("end")); //the last
         return array_stmt;
     }
 }
@@ -181,6 +182,7 @@ Statement_AST Statement():
     ast = Empty_Statement(){return ast;}
     |ast = Assign_Statement(){return ast;}
     |ast = If_Statement() {return ast;}
+    |ast = Echo_Statement() {return ast;}
 }
 
 Statement_AST Empty_Statement():
@@ -191,7 +193,6 @@ Statement_AST Empty_Statement():
     <NEWLINE>
     {
         ast = new Statement_AST("null");
-        System.out.println("a null statement detected");
         return ast;
     }
 }
@@ -207,6 +208,20 @@ Statement_AST Assign_Statement():
     {
         ast = new Statement_AST("=");
         ast.left = t.image;
+        ast.right = ast2;
+        return ast;
+    }
+}
+
+Statement_AST Echo_Statement():
+{
+    Statement_AST ast;
+    Expression_AST ast2;
+}
+{
+    <ECHO> ast2=Expression() <NEWLINE>
+    {
+        ast = new Statement_AST("echo");    
         ast.right = ast2;
         return ast;
     }
