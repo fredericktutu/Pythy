@@ -1,6 +1,11 @@
 # Pythy
 Python-Hongyi Programming Language
 
+## 已实现功能
++ 语句：赋值, 控制台输出`echo`
++ 表达式: 所有
++ 控制台输出至文件
+
 ## 文件架构
 + Pythy
 	+ src(java源文件)
