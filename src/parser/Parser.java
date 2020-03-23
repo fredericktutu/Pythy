@@ -540,7 +540,7 @@ public class Parser implements ParserConstants {
     case BOOL:
       t = jj_consume_token(BOOL);
         boolean b;
-        System.out.println("boolean");
+        //System.out.println("boolean");
         if(t.image.equals("True")) {
             b = true;
         } else {
