@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Pythy编辑器</title>
+    <style type = "text/css">
+    @import url(style.css);
+    </style>
+
+    
+</head>
+<body>
+
+    <div id = "left-menu">
+        <table class = "tab">
+            <tr>
+                <td>
+                    <a href = "#" onclick="openFile()">打开</a>
+                    <input type = "file" id ="file-opener" style = "display: none;" onchange="loadFile()">
+                    </td>
+                <td><a href = "" onclick = "closeFile()">关闭</a></td>
+                <td>
+                    <a href = "" onclick = "">保存</a>
+                </td>
+                <td><a href = "" onclick = "">另存为</a></td>
+
+                <td><a href = "" onclick = "downloadFile()">下载</a></td>
+            </tr>
+        </table>
+    </div>
+    <div id= "filename"></div>
+    <div id = "right-menu">
+        <table class = "tab">
+            <tr>
+                <td><a href = "">执行/单步</a></td>
+                <td><a href="">编译</a></td>
+                <td><a href = "">运行</a></td>
+                <td><a href="">中止</a></td>
+                <td float = "right"><a href = "">控制台/环境</a></td>
+            </tr>
+        </table>
+    </div>
+
+
+
+
+    <div id="main">
+        <div id="leftBox"><textarea wrap="off" cols="2" id="leftNum" disabled></textarea></div>
+        <textarea id = "code" name="content" onscroll="getId('leftNum').scrollTop = this.scrollTop;"></textarea>
+
+
+
+        <textarea id = "console">
+            欢迎使用Pythy语言集成开发环境！
+        </textarea>
+        <textarea id = "input"></textarea>
+        <button id = "clear-btn">清空</button>
+        <button id = "input-btn">输入</button>
+        <div id ="color-menu" font-color ="white">
+            <font>编辑色</font>
+            <input id = "input-color" type = "color" value= "#ffffff" onchange="change_color(0)">
+            <font>控制台色</font>
+            <input id = "console-color" type = "color" value= "#ffffff" onchange="change_color(1)">
+            <font>背景色</font>
+            <input id = "bg-color" type="color" value ="#4169e1" onchange="change_color(2)">
+            <font>菜单色</font>
+            <input id = "menu-color" type = "color" value ="#ece00b" onchange="change_color(3)">
+        </div>
+
+    </div>
+
+
+
+
+
+
+</body>
+<script type = "text/javascript" src = "fileSaver.js" charset="utf-8"></script>
+<script type = "text/javascript" src = "index.js"></script>
+
+
+</html>
+
+<!--
+
+目前需要的API:
+
+动作            参数1               参数2                返回参数1    返回参数2
+保存文件        文件路径            textarea中的代码      成功与否      
+文件另存为      文件路径            textarea中的代码      成功与否
+
+编译           文件路径或直接给代码                       控制台信息
+运行           文件路径或直接给代码  运行模式(单步or普通)   控制台信息   环境可以直接找图片  
+中止                                                    中止成功与否
+
+用户输入       输入框中的字符串                           控制台信息
+-->

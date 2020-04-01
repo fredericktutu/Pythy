@@ -1,0 +1,65 @@
+
+
+.tab
+{
+    font-size: large;
+    color:  white;
+}
+
+#menu
+{
+    background-color: #ece00b;
+}
+#left-menu
+{
+    background-color: #ece00b;
+    float:left;
+}
+
+#filename 
+{
+    color:white;
+    float: left;
+    margin-left: 20px;
+}
+
+#right-menu
+{
+    background-color: #ece00b;
+    float: right;
+}
+body
+{
+    background-color: #4169e1;
+}
+
+
+#main
+{ 
+    width:100%; 
+    height:800px; 
+    clear: left;
+}
+#leftBox{background:#ecf0f5;width:35px; height:100%; text-align:left; float: left;}
+#code{border:1px solid #eaeaea; outline:none; width:48%; height:100%; resize: none; background: rgb(250,250,250); line-height: 24px;font-size: 14px;float: left; padding:10px 8px;  color: black; font-family: inherit; box-sizing: border-box;}
+#leftNum{ height:100%; width: 100%; resize: none;outline:none; overflow-y: hidden; overflow-x: hidden; border: 0; background: rgb(247,247,247); color: #999;line-height: 24px;font-size: 14px; padding:10px 4px; text-align: right; font-weight: bold; box-sizing: border-box;}
+
+#console{border:1px solid #eaeaea; outline:none; width:48%; height:70%; resize: none; background: rgb(250,250,250); line-height: 24px;font-size: 14px;float: right; padding:10px 8px;  color: black; font-family: inherit; box-sizing: border-box;}
+#input{border:1px solid #eaeaea; outline:none; width:48%; height:22%; resize: none; background: rgb(250,250,250); line-height: 24px;font-size: 14px;float: right; padding:10px 8px;  color: black; font-family: inherit; box-sizing: border-box;}
+#input-btn{height:4%; width:24% ;float: right; background-color: #ece00b; font-weight: bold; color: white;}
+#clear-btn{height: 4%; width:24%; float:right; background-color: #ece00b; font-weight: bold; color: #ffffff;}
+
+#color-menu{float:right; color :white;}
+.color-choose{height: 2%; float:right;}
+
+a
+{
+    font-size: 25px;
+    color :white;
+    text-decoration: none;
+}
+a:hover
+{
+    color: blanchedalmond;
+}
+

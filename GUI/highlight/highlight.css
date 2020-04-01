@@ -1,0 +1,16 @@
+#code
+{
+    width : 50%;
+    height: 800px;
+    resize: none;
+}
+
+#color-btn
+{
+    float: right;
+}
+
+#red
+{
+    color : red;
+}
